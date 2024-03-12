@@ -16,7 +16,7 @@ To set up the project on your local machine, follow these steps:
     
     bashCopy code
     
-    `git clone https://github.com/yourgithubusername/intercom-ticket-sorter.git`
+    `git clone https://github.com/AntonVerhasselt/IntercomTicketSorter.git`
     
 3.  Navigate to the project directory:
     
