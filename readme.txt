@@ -12,22 +12,13 @@ Installation
 To set up the project on your local machine, follow these steps:
 
 1.  Ensure you have Node.js installed on your machine.
-2.  Clone the repository:
-    
-    bashCopy code
-    
+2.  Clone the repository:   
     `git clone https://github.com/AntonVerhasselt/IntercomTicketSorter.git`
     
 3.  Navigate to the project directory:
-    
-    bashCopy code
-    
     `cd intercom-ticket-sorter`
     
 4.  Install dependencies:
-    
-    Copy code
-    
     `npm install`
     
 
@@ -35,9 +26,6 @@ Environment Variables
 ---------------------
 
 Set up the required environment variables by creating a `.env` file in the project root with the following content:
-
-makefileCopy code
-
 `INTERCOM_ACCESS_TOKEN=your_intercom_access_token OPENAI_API_KEY=your_openai_api_key`
 
 Replace `your_intercom_access_token` and `your_openai_api_key` with your actual credentials.
@@ -47,22 +35,13 @@ Usage
 
 To run the project locally:
 
-1.  Start the application:
-    
-    sqlCopy code
-    
+1.  Start the application:    
     `npm start`
     
-2.  Install localtunnel to expose your local server:
-    
-    Copy code
-    
+2.  Install localtunnel to expose your local server:    
     `npm install -g localtunnel`
     
-3.  Run localtunnel to get a public link:
-    
-    cssCopy code
-    
+3.  Run localtunnel to get a public link:    
     `lt --port 3000`
     
 4.  Attach the `/webhook` path to the public link provided by localtunnel. Use this URL in your Intercom app to receive notifications from the webhook.
