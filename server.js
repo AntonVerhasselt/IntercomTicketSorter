@@ -8,6 +8,8 @@ const PORT = process.env.PORT || 3000;
 const INTERCOM_ACCESS_TOKEN = process.env.INTERCOM_ACCESS_TOKEN;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+const generateCategoryPromptMessageContent = require('./categoryPromptMessage');
+
 // Middleware
 app.use(bodyParser.json());
 
@@ -48,12 +50,16 @@ const prepareMessagesForGPTPrompt = (conversationData, language) => {
             content: stripHtml(part.body)
         }));
 
-    // Add system message at the beginning
+    // Dynamically generate the content for the system message
+    const systemMessageContent = generateCategoryPromptMessageContent(language);
+
+    // Add system message at the beginning with dynamic content
     messages.unshift({
         role: "system",
-        content: `The messages are in ${language}. Based on the context of the entire conversation, categorize the last user message. If a message could fit more than one category, choose the most likely category based on the context. If it's too ambiguous, indicate the ambiguity in your response. Output should be in English and formatted as a JSON object with 'category' and 'confidence' fields. In cases of ambiguity, include an 'ambiguous' field with value true and list the potential categories. Example of expected output for a clear case: {'category': 'Technical Support', 'confidence': 0.9}. Example for an ambiguous case: {'category': '', 'confidence': 0, 'ambiguous': true, 'potential_categories': ['Billing Issues', 'General Inquiry']}. Categories: Billing Issues (payment or subscription queries), Technical Support (product functionality issues), General Inquiry (broad, general questions), Feedback (suggestions or comments about the service).`
+        content: systemMessageContent
     });
 
+    console.log("Prepared messages for GPT:", messages);
     return messages;
 };
 
@@ -114,6 +120,11 @@ app.post('/webhook', (req, res) => {
     res.status(200).send('Webhook received');
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = { fetchConversationDetails };
+
