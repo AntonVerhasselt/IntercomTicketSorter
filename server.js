@@ -34,34 +34,42 @@ const fetchConversationDetails = async (conversationId) => {
 
         const language = response.data.custom_attributes.Language;
 
+        console.log("Succeeded fetching details");
+
         return { conversationData: response.data, language };
     } catch (error) {
-        console.error('Error fetching conversation details:', error.message);
+        console.error('FetchConversationDetails Error:', error.message);
+        if (error.response) {
+            console.error(`Status: ${error.response.status}, Data:`, error.response.data);
+        } else if (error.request) {
+            console.error('No response received for request.');
+        }
         return null;
     }
 };
 
 // Prepare messages for GPT prompt, stripping HTML from message content and checking for null body
 const prepareMessagesForGPTPrompt = (conversationData, language) => {
-    const messages = conversationData.conversation_parts.conversation_parts
-        .filter(part => part.body !== null && part.body !== undefined)
-        .map(part => ({
-            role: part.author.type === 'admin' ? 'assistant' : 'user',
-            content: stripHtml(part.body)
-        }));
-
-    // Dynamically generate the content for the system message
     const systemMessageContent = generateCategoryPromptMessageContent(language);
-
-    // Add system message at the beginning with dynamic content
-    messages.unshift({
+    const messages = [{
         role: "system",
         content: systemMessageContent
-    });
+    }];
+
+    // Iterate over all conversation parts
+    conversationData.conversation_parts.conversation_parts
+        .filter(part => part.body !== null && part.body !== undefined) // Ensure there's content
+        .forEach(part => {
+            const role = (part.author && part.author.type === 'admin') ? 'assistant' : 'user';
+            const content = stripHtml(part.body);
+
+            messages.push({ role, content });
+        });
 
     console.log("Prepared messages for GPT:", messages);
     return messages;
 };
+
 
 // Send prompt to GPT API
 const sendPromptToGPT = async (messages) => {
@@ -126,5 +134,5 @@ if (require.main === module) {
     });
 }
 
-module.exports = { fetchConversationDetails };
+module.exports = { fetchConversationDetails, prepareMessagesForGPTPrompt, sendPromptToGPT };
 
