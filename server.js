@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 const INTERCOM_ACCESS_TOKEN = process.env.INTERCOM_ACCESS_TOKEN;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-const generateCategoryPromptMessageContent = require('./categoryPromptMessage');
+const categoryPrompts = require('./categoryPrompts');
 
 // Middleware
 app.use(bodyParser.json());
@@ -50,7 +50,7 @@ const fetchConversationDetails = async (conversationId) => {
 
 // Prepare messages for GPT prompt, stripping HTML from message content and checking for null body
 const prepareMessagesForGPTPrompt = (conversationData, language) => {
-    const systemMessageContent = generateCategoryPromptMessageContent(language);
+    const systemMessageContent = categoryPrompts.generateCategorizeInstruction(language);
     const messages = [{
         role: "system",
         content: systemMessageContent
