@@ -9,6 +9,7 @@ const INTERCOM_ACCESS_TOKEN = process.env.INTERCOM_ACCESS_TOKEN;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const categoryPrompts = require('./categoryPrompts');
+const messageRespons = require('./messageRespons');
 
 // Middleware
 app.use(bodyParser.json());
@@ -66,7 +67,7 @@ const prepareMessagesForGPTPrompt = (conversationData, language) => {
             messages.push({ role, content });
         });
 
-    console.log("Prepared messages for GPT:", messages);
+    console.log("Prepared messages for GPT");
     return messages;
 };
 
@@ -110,22 +111,34 @@ const sendPromptToGPT = async (messages) => {
 
 // Route for receiving webhooks
 app.post('/webhook', (req, res) => {
-    console.log('Received webhook:', req.body);
-
     if (req.body.topic === 'conversation.user.created' || req.body.topic === 'conversation.user.replied') {
         const conversationId = req.body.data.item.id;
-        
+
         fetchConversationDetails(conversationId)
             .then(({conversationData, language}) => {
                 const messages = prepareMessagesForGPTPrompt(conversationData, language);
                 sendPromptToGPT(messages)
                     .then(gptResponse => {
-                        console.log('GPT response:', gptResponse);
+                        if (!(gptResponse.choices && gptResponse.choices.length > 0)) {
+                            throw new Error("No choices found in GPT response");
+                        }
+
+                        const jsonResponse = JSON.parse(gptResponse.choices[0].message.content);
+                        if (jsonResponse.category_id && jsonResponse.category_id !== '') {
+                            messageRespons(jsonResponse.category_id, language);
+                        } else {
+                            throw new Error("Missing or empty category_id in GPT response");
+                        }
                     });
+            })
+            .catch(error => {
+                console.error('Error in response processing:', error);
             });
+    } else {
+        console.log("Webhook processed but topic is not handled:", req.body.topic);
     }
 
-    res.status(200).send('Webhook received');
+    res.status(200).send('Webhook processed');
 });
 
 if (require.main === module) {

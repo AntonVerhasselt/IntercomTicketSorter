@@ -42,7 +42,7 @@ function generateResponsInstruction(language, category_id) {
 
     // If the category is found, format the response instruction with the language and explanation
     if (category) {
-        return `These messages are in ${language}. You should write a response for these messages in ${language} with the following message: ${category.respons}`;
+        return `These messages are in ${language}. Write a response for these messages in ${language} and use as mutch context of the conversation as possible. The content of your message should be the following: ${category.respons}`;
     } else {
         // If no matching category is found, return a message indicating that the category_id is invalid
         return `The provided category_id (${category_id}) is invalid. Please provide a valid category_id.`;

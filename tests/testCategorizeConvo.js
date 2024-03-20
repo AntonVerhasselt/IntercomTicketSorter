@@ -34,7 +34,7 @@ async function testCategorizeConvo() {
         if (!preparedMessages) {
             throw new Error('Prepared messages are not defined.');
         }
-        const categorizedMessages = await sendPromptToGPT(preparedMessages); // Ensure this call is awaited
+        const categorizedMessages = await sendPromptToGPT(preparedMessages);
         console.log("Succeeded categorizing conversation", categorizedMessages);
     } catch (error) {
         console.error('Error categorizing messages for GPT:', error);
